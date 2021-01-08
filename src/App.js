@@ -80,7 +80,7 @@ function App() {
   const [error, setError] = useState();
 
   const onSelectAddition = () => {
-    if (parseInt(maxNumberInput) >= 2) {
+    if (maxNumber >= 4) {
       setError("");
       setMaxNumberInput(maxNumber.toString());
       setUseAddition(true);
@@ -94,12 +94,12 @@ function App() {
       setTimeRemaining(63);
       setHasRan(true);
     } else {
-      setError("Max number must be at least 2");
+      setError("Max number must be at least 4");
     }
   };
 
   const onSelectMultiplication = () => {
-    if (parseInt(maxNumberInput) >= 2) {
+    if (maxNumber >= 4) {
       setError("");
       setMaxNumberInput(maxNumber.toString());
       setUseAddition(false);
@@ -113,7 +113,7 @@ function App() {
       setTimeRemaining(63);
       setHasRan(true);
     } else {
-      setError("Max number must be at least 2");
+      setError("Max number must be at least 4");
     }
   };
 
