@@ -37,19 +37,23 @@ function App() {
 
   const [timeRemaining, setTimeRemaining] = useState(0);
 
+  const countdownTimer = useRef();
   useEffect(() => {
     if (timeRemaining <= 0) {
     } else {
-      setTimeout(() => {
+      countdownTimer.current = setTimeout(() => {
         setTimeRemaining(timeRemaining - 1);
       }, 1000);
     }
   }, [timeRemaining]);
 
   const onStart = () => {
+    if (timeRemaining) {
+      clearTimeout(countdownTimer.current);
+    }
     setNumWrong(0);
     setNumCorrect(0);
-    setTimeRemaining(60);
+    setTimeRemaining(63);
   };
 
   const isWaiting = useRef(false);
@@ -57,7 +61,7 @@ function App() {
   const flashTimeout = useRef(null);
 
   const onSelectAnswer = (answer) => {
-    if (timeRemaining) {
+    if (timeRemaining && !isWaiting.current) {
       const actualAnswer = numerator * denominator;
       if (answer === actualAnswer) {
         setNumCorrect(numCorrect + 1);
@@ -80,74 +84,80 @@ function App() {
     }
   };
   useEffect(() => {}, []);
+
+  const countdown = timeRemaining - 60;
   return (
-    <div className="App">
-      <div
-        style={{
-          flex: "1",
-          display: "flex",
-          justifyContent: "center",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <div>
-          <button onClick={onStart}>Start</button>
-          <span>Time left: {timeRemaining}s</span>
-        </div>
+    <div>
+      {countdown > 0 && <div className="countdown">{countdown}</div>}
+      <div className={`App${countdown > 0 ? " app-opaque" : ""}`}>
         <div
           style={{
-            fontSize: "60px",
-            flex: 1,
+            flex: "1",
             display: "flex",
             justifyContent: "center",
+            flexDirection: "column",
             alignItems: "center",
           }}
         >
-          {numerator} X {denominator}
+          <div>
+            <button onClick={onStart}>Start</button>
+            <span>Time left: {timeRemaining}s</span>
+          </div>
+          <div
+            style={{
+              fontWeight: "bold",
+              fontSize: "60px",
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {numerator} X {denominator}
+          </div>
         </div>
-      </div>
-      <div className="Answer">
-        {answers.map((answer) => {
-          const makeGreen =
-            wrongAnswer !== null && answer === numerator * denominator;
+        <div className="Answer">
+          {answers.map((answer) => {
+            const makeGreen =
+              wrongAnswer !== null && answer === numerator * denominator;
 
-          const makeRed = wrongAnswer === answer;
-          return (
-            <div className="AnswerDiv">
-              <button
-                style={{
-                  background: makeGreen
-                    ? "green"
-                    : makeRed
-                    ? "red"
-                    : "lightgrey",
-                }}
-                onClick={() => onSelectAnswer(answer)}
-              >
-                {answer}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-      <div
-        style={{
-          flex: "1",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-evenly",
-          alignItems: "center",
-          fontSize: "60px",
-        }}
-      >
-        <div>
-          Correct:{" "}
-          <span className={`correctanswer${flashGreen ? " flashgreen" : ""}`}>
-            {numCorrect}
-          </span>
+            const makeRed = wrongAnswer === answer;
+            return (
+              <div className="AnswerDiv">
+                <button
+                  style={{
+                    background: makeGreen
+                      ? "lightgreen"
+                      : makeRed
+                      ? "red"
+                      : "lightgrey",
+                  }}
+                  onClick={() => onSelectAnswer(answer)}
+                >
+                  {answer}
+                </button>
+              </div>
+            );
+          })}
         </div>
-        <div>Wrong: {numWrong}</div>
+        <div
+          style={{
+            flex: "1",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-evenly",
+            alignItems: "center",
+            fontSize: "60px",
+          }}
+        >
+          <div>
+            Correct:{" "}
+            <span className={`correctanswer${flashGreen ? " flashgreen" : ""}`}>
+              {numCorrect}
+            </span>
+          </div>
+          <div>Wrong: {numWrong}</div>
+        </div>
       </div>
     </div>
   );
