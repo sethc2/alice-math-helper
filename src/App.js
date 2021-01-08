@@ -6,34 +6,62 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
 
-function getNext() {
-  return getRandomInt(9) + 1;
-}
-
-function getSet() {
-  const numerator = getNext();
-  const denominator = getNext();
-
-  const set = new Set();
-  set.add(numerator * denominator);
-  while (set.size < 4) {
-    set.add(getNext() * denominator);
-  }
-
-  const answers = Array.from(set);
-  answers.sort((a, b) => a - b);
-  return { numerator, denominator, answers };
-}
-
 function App() {
-  const [
-    { numerator, denominator, answers },
-    setCurrentProblem,
-  ] = useState(() => getSet());
+  const [hasRan, setHasRan] = useState(false);
+  const [showIntro, setShowInto] = useState(true);
+  const [maxNumber, setMaxNumber] = useState(9);
+  const [maxNumberInput, setMaxNumberInput] = useState(maxNumber.toString());
+  const [useAddition, setUseAddition] = useState(false);
+
   const [wrongAnswer, setWrongAnswer] = useState(null);
   const [flashGreen, setFlashGreen] = useState(false);
   const [numCorrect, setNumCorrect] = useState(0);
   const [numWrong, setNumWrong] = useState(0);
+
+  const getNext = () => {
+    return getRandomInt(maxNumber) + 1;
+  };
+
+  const getAddition = () => {
+    const firstNumber = getNext();
+    const secondNumber = getNext();
+
+    const set = new Set();
+    set.add(firstNumber + secondNumber);
+    while (set.size < 4) {
+      set.add(getNext() + secondNumber);
+    }
+
+    const answers = Array.from(set);
+    answers.sort((a, b) => a - b);
+    return { number1: firstNumber, number2: secondNumber, answers };
+  };
+
+  const getMultiplication = () => {
+    const numerator = getNext();
+    const denominator = getNext();
+
+    const set = new Set();
+    set.add(numerator * denominator);
+    while (set.size < 4) {
+      set.add(getNext() * denominator);
+    }
+
+    const answers = Array.from(set);
+    answers.sort((a, b) => a - b);
+    return { number1: numerator, number2: denominator, answers };
+  };
+
+  const getSet = (addition) => {
+    if (addition) {
+      return getAddition();
+    }
+    return getMultiplication();
+  };
+
+  const [{ number1, number2, answers }, setCurrentProblem] = useState(() =>
+    getSet()
+  );
 
   const [timeRemaining, setTimeRemaining] = useState(0);
 
@@ -47,13 +75,46 @@ function App() {
     }
   }, [timeRemaining]);
 
-  const onStart = () => {
-    if (timeRemaining) {
-      clearTimeout(countdownTimer.current);
+  const onStart = () => {};
+
+  const [error, setError] = useState();
+
+  const onSelectAddition = () => {
+    if (parseInt(maxNumberInput) >= 2) {
+      setError("");
+      setMaxNumberInput(maxNumber.toString());
+      setUseAddition(true);
+      onStart();
+      if (timeRemaining) {
+        clearTimeout(countdownTimer.current);
+      }
+      setCurrentProblem(getSet(true));
+      setNumWrong(0);
+      setNumCorrect(0);
+      setTimeRemaining(63);
+      setHasRan(true);
+    } else {
+      setError("Max number must be at least 2");
     }
-    setNumWrong(0);
-    setNumCorrect(0);
-    setTimeRemaining(63);
+  };
+
+  const onSelectMultiplication = () => {
+    if (parseInt(maxNumberInput) >= 2) {
+      setError("");
+      setMaxNumberInput(maxNumber.toString());
+      setUseAddition(false);
+      onStart();
+      if (timeRemaining) {
+        clearTimeout(countdownTimer.current);
+      }
+      setCurrentProblem(getSet(false));
+      setNumWrong(0);
+      setNumCorrect(0);
+      setTimeRemaining(63);
+      setHasRan(true);
+    } else {
+      setError("Max number must be at least 2");
+    }
   };
 
   const isWaiting = useRef(false);
@@ -62,10 +123,10 @@ function App() {
 
   const onSelectAnswer = (answer) => {
     if (timeRemaining && !isWaiting.current) {
-      const actualAnswer = numerator * denominator;
+      const actualAnswer = useAddition ? number1 + number2 : number1 * number2;
       if (answer === actualAnswer) {
         setNumCorrect(numCorrect + 1);
-        setCurrentProblem(getSet());
+        setCurrentProblem(getSet(useAddition));
         setFlashGreen(true);
         clearTimeout(flashTimeout.current);
         flashTimeout.current = setTimeout(() => {
@@ -77,7 +138,7 @@ function App() {
         setWrongAnswer(answer);
         setTimeout(() => {
           setWrongAnswer(null);
-          setCurrentProblem(getSet());
+          setCurrentProblem(getSet(useAddition));
           isWaiting.current = false;
         }, 2000);
       }
@@ -88,77 +149,121 @@ function App() {
   const countdown = timeRemaining - 60;
   return (
     <div>
-      {countdown > 0 && <div className="countdown">{countdown}</div>}
-      <div className={`App${countdown > 0 ? " app-opaque" : ""}`}>
-        <div
-          style={{
-            flex: "1",
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
+      {!timeRemaining && (
+        <div className="intro">
           <div>
-            <button onClick={onStart}>Start</button>
-            <span>Time left: {timeRemaining}s</span>
+            <label>Max number:</label>
+            <input
+              type="number"
+              value={maxNumberInput}
+              min={2}
+              onChange={(e) => {
+                setMaxNumberInput(e.target.value);
+                setMaxNumber(
+                  parseInt(e.target.value, 10) > 2
+                    ? parseInt(e.target.value, 10)
+                    : 9
+                );
+              }}
+            />
+            {error && <div style={{ color: "red" }}>{error}</div>}
           </div>
+          <button style={{ fontSize: 20 }} onClick={onSelectAddition}>
+            Addition test
+          </button>
+          <button style={{ fontSize: 20 }} onClick={onSelectMultiplication}>
+            Multiplication test
+          </button>
+          <div>
+            {hasRan && !timeRemaining ? `You got ${numCorrect} right!` : ""}
+          </div>
+        </div>
+      )}
+      {countdown > 0 && <div className="countdown">{countdown}</div>}
+      {countdown <= 0 && timeRemaining > 0 && (
+        <div className={`App${countdown > 0 ? " app-opaque" : ""}`}>
           <div
             style={{
-              fontWeight: "bold",
-              fontSize: "60px",
-              flex: 1,
+              flex: "1",
               display: "flex",
               justifyContent: "center",
+              flexDirection: "column",
               alignItems: "center",
             }}
           >
-            {numerator} X {denominator}
+            <div>
+              <span>Time left: {timeRemaining}s</span>
+            </div>
+            <div
+              style={{
+                fontWeight: "bold",
+                fontSize: "60px",
+                flex: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {!useAddition && (
+                <span>
+                  {number1} X {number2}
+                </span>
+              )}
+              {useAddition && (
+                <span>
+                  {number1} + {number2}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
-        <div className="Answer">
-          {answers.map((answer) => {
-            const makeGreen =
-              wrongAnswer !== null && answer === numerator * denominator;
+          <div className="Answer">
+            {answers.map((answer) => {
+              const makeGreen =
+                wrongAnswer !== null &&
+                answer ===
+                  (useAddition ? number1 + number2 : number1 * number2);
 
-            const makeRed = wrongAnswer === answer;
-            return (
-              <div className="AnswerDiv">
-                <button
-                  style={{
-                    background: makeGreen
-                      ? "lightgreen"
-                      : makeRed
-                      ? "red"
-                      : "lightgrey",
-                  }}
-                  onClick={() => onSelectAnswer(answer)}
-                >
-                  {answer}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-        <div
-          style={{
-            flex: "1",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-evenly",
-            alignItems: "center",
-            fontSize: "60px",
-          }}
-        >
-          <div>
-            Correct:{" "}
-            <span className={`correctanswer${flashGreen ? " flashgreen" : ""}`}>
-              {numCorrect}
-            </span>
+              const makeRed = wrongAnswer === answer;
+              return (
+                <div className="AnswerDiv">
+                  <button
+                    style={{
+                      background: makeGreen
+                        ? "lightgreen"
+                        : makeRed
+                        ? "red"
+                        : "lightgrey",
+                    }}
+                    onClick={() => onSelectAnswer(answer)}
+                  >
+                    {answer}
+                  </button>
+                </div>
+              );
+            })}
           </div>
-          <div>Wrong: {numWrong}</div>
+          <div
+            style={{
+              flex: "1",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+              fontSize: "60px",
+            }}
+          >
+            <div>
+              Correct:{" "}
+              <span
+                className={`correctanswer${flashGreen ? " flashgreen" : ""}`}
+              >
+                {numCorrect}
+              </span>
+            </div>
+            <div>Wrong: {numWrong}</div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
