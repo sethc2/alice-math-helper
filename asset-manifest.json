@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/alice-math-helper/static/css/main.954857d9.chunk.css",
+    "main.js": "/alice-math-helper/static/js/main.cf824703.chunk.js",
+    "main.js.map": "/alice-math-helper/static/js/main.cf824703.chunk.js.map",
+    "runtime-main.js": "/alice-math-helper/static/js/runtime-main.f815172e.js",
+    "runtime-main.js.map": "/alice-math-helper/static/js/runtime-main.f815172e.js.map",
+    "static/js/2.7704a6b2.chunk.js": "/alice-math-helper/static/js/2.7704a6b2.chunk.js",
+    "static/js/2.7704a6b2.chunk.js.map": "/alice-math-helper/static/js/2.7704a6b2.chunk.js.map",
+    "static/js/3.e92b08db.chunk.js": "/alice-math-helper/static/js/3.e92b08db.chunk.js",
+    "static/js/3.e92b08db.chunk.js.map": "/alice-math-helper/static/js/3.e92b08db.chunk.js.map",
+    "index.html": "/alice-math-helper/index.html",
+    "static/css/main.954857d9.chunk.css.map": "/alice-math-helper/static/css/main.954857d9.chunk.css.map",
+    "static/js/2.7704a6b2.chunk.js.LICENSE.txt": "/alice-math-helper/static/js/2.7704a6b2.chunk.js.LICENSE.txt",
+    "static/media/logo.6ce24c58.svg": "/alice-math-helper/static/media/logo.6ce24c58.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.f815172e.js",
+    "static/js/2.7704a6b2.chunk.js",
+    "static/css/main.954857d9.chunk.css",
+    "static/js/main.cf824703.chunk.js"
+  ]
+}
