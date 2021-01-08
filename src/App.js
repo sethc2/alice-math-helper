@@ -1,6 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -30,8 +30,10 @@ function App() {
     { numerator, denominator, answers },
     setCurrentProblem,
   ] = useState(() => getSet());
+  const [wrongAnswer, setWrongAnswer] = useState(null);
+  const [flashGreen, setFlashGreen] = useState(false);
   const [numCorrect, setNumCorrect] = useState(0);
-  const [numWrong, setNumWrong] = useState(60);
+  const [numWrong, setNumWrong] = useState(0);
 
   const [timeRemaining, setTimeRemaining] = useState(0);
 
@@ -46,19 +48,35 @@ function App() {
 
   const onStart = () => {
     setNumWrong(0);
-    setNumWrong(0);
+    setNumCorrect(0);
     setTimeRemaining(60);
   };
+
+  const isWaiting = useRef(false);
+
+  const flashTimeout = useRef(null);
 
   const onSelectAnswer = (answer) => {
     if (timeRemaining) {
       const actualAnswer = numerator * denominator;
       if (answer === actualAnswer) {
         setNumCorrect(numCorrect + 1);
+        setCurrentProblem(getSet());
+        setFlashGreen(true);
+        clearTimeout(flashTimeout.current);
+        flashTimeout.current = setTimeout(() => {
+          setFlashGreen(false);
+        }, 1000);
       } else {
+        isWaiting.current = true;
         setNumWrong(numWrong + 1);
+        setWrongAnswer(answer);
+        setTimeout(() => {
+          setWrongAnswer(null);
+          setCurrentProblem(getSet());
+          isWaiting.current = false;
+        }, 2000);
       }
-      setCurrentProblem(getSet());
     }
   };
   useEffect(() => {}, []);
@@ -90,11 +108,28 @@ function App() {
         </div>
       </div>
       <div className="Answer">
-        {answers.map((answer) => (
-          <div className="AnswerDiv">
-            <button onClick={() => onSelectAnswer(answer)}>{answer}</button>
-          </div>
-        ))}
+        {answers.map((answer) => {
+          const makeGreen =
+            wrongAnswer !== null && answer === numerator * denominator;
+
+          const makeRed = wrongAnswer === answer;
+          return (
+            <div className="AnswerDiv">
+              <button
+                style={{
+                  background: makeGreen
+                    ? "green"
+                    : makeRed
+                    ? "red"
+                    : "lightgrey",
+                }}
+                onClick={() => onSelectAnswer(answer)}
+              >
+                {answer}
+              </button>
+            </div>
+          );
+        })}
       </div>
       <div
         style={{
@@ -106,7 +141,12 @@ function App() {
           fontSize: "60px",
         }}
       >
-        <div>Correct: {numCorrect}</div>
+        <div>
+          Correct:{" "}
+          <span className={`correctanswer${flashGreen ? " flashgreen" : ""}`}>
+            {numCorrect}
+          </span>
+        </div>
         <div>Wrong: {numWrong}</div>
       </div>
     </div>

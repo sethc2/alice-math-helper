@@ -26,11 +26,21 @@
   height: 100%;
   width: 100%;
   font-size: 24px;
+  transition: background 0.5s;
 }
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+}
+
+.correctanswer {
+  transition: background 0.5s ease-in;
+  color: black;
+}
+
+.correctanswer.flashgreen {
+  background: green;
 }
 
 @media (prefers-reduced-motion: no-preference) {
