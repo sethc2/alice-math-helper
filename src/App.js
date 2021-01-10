@@ -337,7 +337,7 @@ function App() {
                 onChange={(e) => {
                   setGoalInput(e.target.value);
                   const newGoal = parseInt(e.target.value);
-                  if (newGoal > 10 && newGoal < 100) {
+                  if (newGoal > 5 && newGoal < 100) {
                     setGoal(newGoal);
                   }
                 }}
