@@ -15,11 +15,13 @@
   grid-row: 2, 2;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
+  margin-left: 10px;
 }
 
 .AnswerDiv {
   height: 100%;
   width: 100%;
+  margin: 5px;
 }
 
 .AnswerDiv button {
@@ -97,9 +99,19 @@ meter::-webkit-meter-bar {
   box-shadow: 0 5px 5px -5px #333 inset;
 }
 
-meter::-webkit-meter-optimum-value {
+:root {
+  --meter-color: #ffff00;
+  --other-meter-color: #00ff00;
+  --red-rgb: 0;
+  --green-rgb: 255;
+  --transition-speed: 0.5s;
+}
+
+.Answer meter::-webkit-meter-optimum-value {
   box-shadow: 0 5px 5px -5px #999 inset;
-  background-image: linear-gradient(
+  background-color: var(--meter-color);
+  transition: background-color var(--transition-speed) ease-in-out;
+  /* background-image: linear-gradient(
     90deg,
     #ff0000 0%,
     #00ff00 100%
@@ -112,8 +124,8 @@ meter::-webkit-meter-optimum-value {
     #40ff00 95%,
     #00ff15 95%,
     #00ff00 100% */
-  );
-  background-size: 100% 100%;
+  /* );
+  background-size: 100% 100%; */
 }
 
 @media (prefers-reduced-motion: no-preference) {

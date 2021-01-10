@@ -17,7 +17,9 @@ function App() {
   const [flashGreen, setFlashGreen] = useState(false);
   const [numCorrect, setNumCorrect] = useState(0);
   const [numWrong, setNumWrong] = useState(0);
-  const [score, setScore] = useState(0);
+
+  const currentNumCorrect = useRef(numCorrect);
+  currentNumCorrect.current = numCorrect;
 
   const [meterValue, setMeterValue] = useState(0);
 
@@ -72,11 +74,16 @@ function App() {
 
   const [timeRemaining, setTimeRemaining] = useState(0);
 
+  const currentTimeRemaining = useRef(timeRemaining);
+
+  currentTimeRemaining.current = timeRemaining;
+
   const countdownTimer = useRef();
   useEffect(() => {
     if (timeRemaining <= 0) {
     } else {
       countdownTimer.current = setTimeout(() => {
+        currentTimeRemaining.current = timeRemaining - 1;
         setTimeRemaining(timeRemaining - 1);
         //setMeterValue(Math.max(0, currentMeterValue.current - 1.5));
       }, 1000);
@@ -95,8 +102,17 @@ function App() {
   useEffect(() => {
     if (timeRemaining > 0 && !meterTimer.current && countdown <= 0) {
       meterTimer.current = setInterval(() => {
-        currentMeterValue.current -= goal / 60 / 2;
-        setMeterValue(Math.max(0, currentMeterValue.current));
+        if (currentTimeRemaining.current > 0) {
+          const delta = Math.max(
+            0.001,
+            (goal + 1 - currentNumCorrect.current) /
+              currentTimeRemaining.current /
+              2
+          );
+
+          currentMeterValue.current -= delta;
+          setMeterValue(Math.max(0, currentMeterValue.current));
+        }
       }, 50);
     }
   }, [timeRemaining, goal]);
@@ -113,8 +129,10 @@ function App() {
     }
     setCurrentProblem(getSet(true));
     setNumWrong(0);
+
+    currentNumCorrect.current = 0;
     setNumCorrect(0);
-    setScore(0);
+
     setTimeRemaining(63);
     setHasRan(true);
   };
@@ -129,8 +147,10 @@ function App() {
     }
     setCurrentProblem(getSet(false));
     setNumWrong(0);
+
+    currentNumCorrect.current = numCorrect;
     setNumCorrect(0);
-    setScore(0);
+
     setTimeRemaining(63);
     setHasRan(true);
   };
@@ -143,8 +163,9 @@ function App() {
     if (timeRemaining && !isWaiting.current) {
       const actualAnswer = useAddition ? number1 + number2 : number1 * number2;
       if (answer === actualAnswer) {
+        currentNumCorrect.current = numCorrect + 1;
         setNumCorrect(numCorrect + 1);
-        setScore(score + Math.floor(currentMeterValue.current));
+
         currentMeterValue.current = 10;
         setMeterValue(10);
         setCurrentProblem(getSet(useAddition));
@@ -332,7 +353,6 @@ function App() {
               {" "}
               {hasRan && !timeRemaining ? `You got ${numWrong} wrong.` : ""}
             </div>
-            <div>{hasRan && !timeRemaining ? `You scored ${score}!` : ""}</div>
           </div>
           <button style={{ fontSize: 20 }} onClick={onSelectAddition}>
             Addition test
@@ -391,7 +411,7 @@ function App() {
                 <div
                   className="AnswerDiv"
                   style={{
-                    gridColumnStart: (index % 2) + 1,
+                    gridColumnStart: index % 2 ? 1 : 2,
                     gridRowStart: index >= 2 ? 2 : 1,
                   }}
                 >
@@ -426,9 +446,28 @@ function App() {
                 value={meterValue}
                 style={{
                   transform: "rotate(270deg)",
-                  height: "80px",
-                  width: "190px",
+                  height: "60px",
+                  width: "170px",
                   position: "absolute",
+                  "--transition-speed": meterValue >= 8 ? "0" : "0.5s",
+                  "--meter-color":
+                    meterValue >= 8
+                      ? "green"
+                      : meterValue > 5
+                      ? "yellow"
+                      : "red",
+                  "--red-rgb":
+                    meterValue >= 8
+                      ? 0
+                      : meterValue < 5
+                      ? 255
+                      : (255 * (meterValue - 5)) / 3,
+                  "--green-rgb":
+                    meterValue >= 5
+                      ? 255
+                      : meterValue <= 2
+                      ? 0
+                      : 255 - (255 * (meterValue - 2)) / 3,
                 }}
               ></meter>
             </div>
@@ -444,15 +483,10 @@ function App() {
             }}
           >
             <div style={{ fontSize: 32 }}>
-              Correct:{" "}
-              <span
-                className={`correctanswer${flashGreen ? " flashgreen" : ""}`}
-              >
-                {numCorrect}
-              </span>
+              Goal progress:{" "}
+              <meter value={numCorrect} min={0} max={goal}></meter>
             </div>
             <div style={{ fontSize: 32 }}>Wrong: {numWrong}</div>
-            <div style={{ fontSize: 32 }}>Score: {score}</div>
           </div>
         </div>
       )}
