@@ -411,7 +411,7 @@ function App() {
                 <div
                   className="AnswerDiv"
                   style={{
-                    gridColumnStart: index % 2 ? 1 : 2,
+                    gridColumnStart: index % 2 ? 2 : 1,
                     gridRowStart: index >= 2 ? 2 : 1,
                   }}
                 >
