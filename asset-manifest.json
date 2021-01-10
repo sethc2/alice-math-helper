@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/alice-math-helper/static/css/main.5eeb0f3f.chunk.css",
-    "main.js": "/alice-math-helper/static/js/main.97f89b66.chunk.js",
-    "main.js.map": "/alice-math-helper/static/js/main.97f89b66.chunk.js.map",
+    "main.js": "/alice-math-helper/static/js/main.1a1fbd6b.chunk.js",
+    "main.js.map": "/alice-math-helper/static/js/main.1a1fbd6b.chunk.js.map",
     "runtime-main.js": "/alice-math-helper/static/js/runtime-main.f815172e.js",
     "runtime-main.js.map": "/alice-math-helper/static/js/runtime-main.f815172e.js.map",
     "static/js/2.7704a6b2.chunk.js": "/alice-math-helper/static/js/2.7704a6b2.chunk.js",
@@ -18,6 +18,6 @@
     "static/js/runtime-main.f815172e.js",
     "static/js/2.7704a6b2.chunk.js",
     "static/css/main.5eeb0f3f.chunk.css",
-    "static/js/main.97f89b66.chunk.js"
+    "static/js/main.1a1fbd6b.chunk.js"
   ]
 }
