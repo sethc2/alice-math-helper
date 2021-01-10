@@ -93,17 +93,19 @@ function App() {
   const countdown = timeRemaining - 60;
 
   useEffect(() => {
-    if (timeRemaining > 0 && !meterTimer.current) {
+    if (timeRemaining > 0 && !meterTimer.current && countdown <= 0) {
       meterTimer.current = setInterval(() => {
-        setMeterValue(Math.max(0, currentMeterValue.current - goal / 600));
-      }, 100);
+        currentMeterValue.current -= goal / 60 / 2;
+        setMeterValue(Math.max(0, currentMeterValue.current));
+      }, 50);
     }
   }, [timeRemaining, goal]);
 
   const onStart = () => {};
 
   const onSelectAddition = () => {
-    setMeterValue(0);
+    currentMeterValue.current = 10;
+    setMeterValue(10);
     setUseAddition(true);
     onStart();
     if (timeRemaining) {
@@ -118,7 +120,8 @@ function App() {
   };
 
   const onSelectMultiplication = () => {
-    setMeterValue(0);
+    currentMeterValue.current = 10;
+    setMeterValue(10);
     setUseAddition(false);
     onStart();
     if (timeRemaining) {
@@ -142,7 +145,8 @@ function App() {
       if (answer === actualAnswer) {
         setNumCorrect(numCorrect + 1);
         setScore(score + Math.floor(currentMeterValue.current));
-        setMeterValue(Math.min(10, currentMeterValue.current + 1));
+        currentMeterValue.current = 10;
+        setMeterValue(10);
         setCurrentProblem(getSet(useAddition));
         setFlashGreen(true);
         clearTimeout(flashTimeout.current);
@@ -387,8 +391,8 @@ function App() {
                 <div
                   className="AnswerDiv"
                   style={{
-                    gridColumnStart: index >= 2 ? 2 : 1,
-                    gridRowStart: (index % 2) + 1,
+                    gridColumnStart: (index % 2) + 1,
+                    gridRowStart: index >= 2 ? 2 : 1,
                   }}
                 >
                   <button
