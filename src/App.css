@@ -13,7 +13,7 @@
   flex: 1;
   display: grid;
   grid-row: 2, 2;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
 }
 
@@ -62,6 +62,22 @@
   background: white;
 }
 
+.levels button {
+  outline: none;
+  width: 40px;
+  height: 40px;
+}
+
+.levels .selected {
+  border: 2px solid black;
+}
+
+.levelsdesc {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
 .countdown {
   position: absolute;
   top: 0;
@@ -73,6 +89,31 @@
   align-items: center;
   z-index: 4;
   font-size: 96px;
+}
+
+meter::-webkit-meter-bar {
+  background: none; /* Required to get rid of the default background property */
+  background-color: whiteSmoke;
+  box-shadow: 0 5px 5px -5px #333 inset;
+}
+
+meter::-webkit-meter-optimum-value {
+  box-shadow: 0 5px 5px -5px #999 inset;
+  background-image: linear-gradient(
+    90deg,
+    #ff0000 0%,
+    #00ff00 100%
+      /* #ff0000 5%,
+    #ff3c00 5%,
+    #ffb700 15%,
+    #ffe100 15%,
+    #c8ff00 55%,
+    #b3ff00 55%,
+    #40ff00 95%,
+    #00ff15 95%,
+    #00ff00 100% */
+  );
+  background-size: 100% 100%;
 }
 
 @media (prefers-reduced-motion: no-preference) {

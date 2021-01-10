@@ -8,15 +8,22 @@ function getRandomInt(max) {
 
 function App() {
   const [hasRan, setHasRan] = useState(false);
-  const [showIntro, setShowInto] = useState(true);
   const [maxNumber, setMaxNumber] = useState(9);
-  const [maxNumberInput, setMaxNumberInput] = useState(maxNumber.toString());
   const [useAddition, setUseAddition] = useState(false);
+
+  const [goal, setGoal] = useState(30);
 
   const [wrongAnswer, setWrongAnswer] = useState(null);
   const [flashGreen, setFlashGreen] = useState(false);
   const [numCorrect, setNumCorrect] = useState(0);
   const [numWrong, setNumWrong] = useState(0);
+  const [score, setScore] = useState(0);
+
+  const [meterValue, setMeterValue] = useState(0);
+
+  const currentMeterValue = useRef(meterValue);
+
+  currentMeterValue.current = meterValue;
 
   const getNext = () => {
     return getRandomInt(maxNumber) + 1;
@@ -71,50 +78,58 @@ function App() {
     } else {
       countdownTimer.current = setTimeout(() => {
         setTimeRemaining(timeRemaining - 1);
+        //setMeterValue(Math.max(0, currentMeterValue.current - 1.5));
       }, 1000);
     }
   }, [timeRemaining]);
 
+  const meterTimer = useRef();
+
+  if (timeRemaining <= 0 && meterTimer.current) {
+    clearInterval(meterTimer.current);
+    meterTimer.current = null;
+  }
+
+  const countdown = timeRemaining - 60;
+
+  useEffect(() => {
+    if (timeRemaining > 0 && !meterTimer.current) {
+      meterTimer.current = setInterval(() => {
+        setMeterValue(Math.max(0, currentMeterValue.current - goal / 600));
+      }, 100);
+    }
+  }, [timeRemaining, goal]);
+
   const onStart = () => {};
 
-  const [error, setError] = useState();
-
   const onSelectAddition = () => {
-    if (maxNumber >= 4) {
-      setError("");
-      setMaxNumberInput(maxNumber.toString());
-      setUseAddition(true);
-      onStart();
-      if (timeRemaining) {
-        clearTimeout(countdownTimer.current);
-      }
-      setCurrentProblem(getSet(true));
-      setNumWrong(0);
-      setNumCorrect(0);
-      setTimeRemaining(63);
-      setHasRan(true);
-    } else {
-      setError("Max number must be at least 4");
+    setMeterValue(0);
+    setUseAddition(true);
+    onStart();
+    if (timeRemaining) {
+      clearTimeout(countdownTimer.current);
     }
+    setCurrentProblem(getSet(true));
+    setNumWrong(0);
+    setNumCorrect(0);
+    setScore(0);
+    setTimeRemaining(63);
+    setHasRan(true);
   };
 
   const onSelectMultiplication = () => {
-    if (maxNumber >= 4) {
-      setError("");
-      setMaxNumberInput(maxNumber.toString());
-      setUseAddition(false);
-      onStart();
-      if (timeRemaining) {
-        clearTimeout(countdownTimer.current);
-      }
-      setCurrentProblem(getSet(false));
-      setNumWrong(0);
-      setNumCorrect(0);
-      setTimeRemaining(63);
-      setHasRan(true);
-    } else {
-      setError("Max number must be at least 4");
+    setMeterValue(0);
+    setUseAddition(false);
+    onStart();
+    if (timeRemaining) {
+      clearTimeout(countdownTimer.current);
     }
+    setCurrentProblem(getSet(false));
+    setNumWrong(0);
+    setNumCorrect(0);
+    setScore(0);
+    setTimeRemaining(63);
+    setHasRan(true);
   };
 
   const isWaiting = useRef(false);
@@ -126,6 +141,8 @@ function App() {
       const actualAnswer = useAddition ? number1 + number2 : number1 * number2;
       if (answer === actualAnswer) {
         setNumCorrect(numCorrect + 1);
+        setScore(score + Math.floor(currentMeterValue.current));
+        setMeterValue(Math.min(10, currentMeterValue.current + 1));
         setCurrentProblem(getSet(useAddition));
         setFlashGreen(true);
         clearTimeout(flashTimeout.current);
@@ -144,29 +161,174 @@ function App() {
       }
     }
   };
-  useEffect(() => {}, []);
-
-  const countdown = timeRemaining - 60;
+  const [goalInput, setGoalInput] = useState(goal);
   return (
     <div>
       {!timeRemaining && (
         <div className="intro">
-          <div>
-            <label>Max number:</label>
-            <input
-              type="number"
-              value={maxNumberInput}
-              min={2}
-              onChange={(e) => {
-                setMaxNumberInput(e.target.value);
-                setMaxNumber(
-                  parseInt(e.target.value, 10) > 2
-                    ? parseInt(e.target.value, 10)
-                    : 9
-                );
+          <div className="levels">
+            <div className="levelsdesc">Select difficulty</div>
+            <button
+              className={maxNumber === 4 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(4);
               }}
-            />
-            {error && <div style={{ color: "red" }}>{error}</div>}
+            >
+              4
+            </button>
+            <button
+              className={maxNumber === 5 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(5);
+              }}
+            >
+              5
+            </button>
+            <button
+              className={maxNumber === 6 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(6);
+              }}
+            >
+              6
+            </button>
+            <button
+              className={maxNumber === 7 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(7);
+              }}
+            >
+              7
+            </button>
+            <button
+              className={maxNumber === 8 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(8);
+              }}
+            >
+              8
+            </button>
+            <button
+              className={maxNumber === 9 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(9);
+              }}
+            >
+              9
+            </button>
+            <button
+              className={maxNumber === 10 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(10);
+              }}
+            >
+              10
+            </button>
+            <button
+              className={maxNumber === 11 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(11);
+              }}
+            >
+              11
+            </button>
+            <button
+              className={maxNumber === 12 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(12);
+              }}
+            >
+              12
+            </button>
+            <button
+              className={maxNumber === 13 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(13);
+              }}
+            >
+              13
+            </button>
+            <button
+              className={maxNumber === 14 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(14);
+              }}
+            >
+              14
+            </button>
+            <button
+              className={maxNumber === 15 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(15);
+              }}
+            >
+              15
+            </button>
+            <button
+              className={maxNumber === 16 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(16);
+              }}
+            >
+              16
+            </button>
+            <button
+              className={maxNumber === 17 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(17);
+              }}
+            >
+              17
+            </button>
+            <button
+              className={maxNumber === 18 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(18);
+              }}
+            >
+              18
+            </button>
+            <button
+              className={maxNumber === 19 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(19);
+              }}
+            >
+              19
+            </button>
+            <button
+              className={maxNumber === 20 ? "selected" : ""}
+              onClick={() => {
+                setMaxNumber(20);
+              }}
+            >
+              20
+            </button>
+            <div>
+              <label>Goal: </label>
+              <input
+                type="number"
+                value={goalInput}
+                onChange={(e) => {
+                  setGoalInput(e.target.value);
+                  const newGoal = parseInt(e.target.value);
+                  if (newGoal > 10 && newGoal < 100) {
+                    setGoal(newGoal);
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <div>
+              {hasRan && !timeRemaining ? `You got ${numCorrect} right!` : ""}
+            </div>
+            <div>
+              {" "}
+              {hasRan && !timeRemaining ? `You got ${numWrong} wrong.` : ""}
+            </div>
+            <div>{hasRan && !timeRemaining ? `You scored ${score}!` : ""}</div>
           </div>
           <button style={{ fontSize: 20 }} onClick={onSelectAddition}>
             Addition test
@@ -174,9 +336,6 @@ function App() {
           <button style={{ fontSize: 20 }} onClick={onSelectMultiplication}>
             Multiplication test
           </button>
-          <div>
-            {hasRan && !timeRemaining ? `You got ${numCorrect} right!` : ""}
-          </div>
         </div>
       )}
       {countdown > 0 && <div className="countdown">{countdown}</div>}
@@ -192,7 +351,7 @@ function App() {
             }}
           >
             <div>
-              <span>Time left: {timeRemaining}s</span>
+              <div>Time left: {timeRemaining}s</div>
             </div>
             <div
               style={{
@@ -217,7 +376,7 @@ function App() {
             </div>
           </div>
           <div className="Answer">
-            {answers.map((answer) => {
+            {answers.map((answer, index) => {
               const makeGreen =
                 wrongAnswer !== null &&
                 answer ===
@@ -225,7 +384,13 @@ function App() {
 
               const makeRed = wrongAnswer === answer;
               return (
-                <div className="AnswerDiv">
+                <div
+                  className="AnswerDiv"
+                  style={{
+                    gridColumnStart: index >= 2 ? 2 : 1,
+                    gridRowStart: (index % 2) + 1,
+                  }}
+                >
                   <button
                     style={{
                       background: makeGreen
@@ -241,6 +406,28 @@ function App() {
                 </div>
               );
             })}
+            <div
+              style={{
+                gridColumnStart: 3,
+                gridRowStart: 1,
+                gridRowEnd: 3,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <meter
+                max={10}
+                min={0}
+                value={meterValue}
+                style={{
+                  transform: "rotate(270deg)",
+                  height: "80px",
+                  width: "190px",
+                  position: "absolute",
+                }}
+              ></meter>
+            </div>
           </div>
           <div
             style={{
@@ -252,7 +439,7 @@ function App() {
               fontSize: "60px",
             }}
           >
-            <div>
+            <div style={{ fontSize: 32 }}>
               Correct:{" "}
               <span
                 className={`correctanswer${flashGreen ? " flashgreen" : ""}`}
@@ -260,7 +447,8 @@ function App() {
                 {numCorrect}
               </span>
             </div>
-            <div>Wrong: {numWrong}</div>
+            <div style={{ fontSize: 32 }}>Wrong: {numWrong}</div>
+            <div style={{ fontSize: 32 }}>Score: {score}</div>
           </div>
         </div>
       )}
