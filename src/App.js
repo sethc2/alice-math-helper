@@ -1,6 +1,6 @@
-import logo from "./logo.svg";
-import "./App.css";
+import "./global.css";
 import { useEffect, useState, useRef } from "react";
+import Levels from "./components/levels";
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -190,145 +190,10 @@ function App() {
   return (
     <div>
       {!timeRemaining && (
-        <div className="intro">
-          <div className="levels">
-            <div className="levelsdesc">Select difficulty</div>
-            <button
-              className={maxNumber === 4 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(4);
-              }}
-            >
-              4
-            </button>
-            <button
-              className={maxNumber === 5 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(5);
-              }}
-            >
-              5
-            </button>
-            <button
-              className={maxNumber === 6 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(6);
-              }}
-            >
-              6
-            </button>
-            <button
-              className={maxNumber === 7 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(7);
-              }}
-            >
-              7
-            </button>
-            <button
-              className={maxNumber === 8 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(8);
-              }}
-            >
-              8
-            </button>
-            <button
-              className={maxNumber === 9 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(9);
-              }}
-            >
-              9
-            </button>
-            <button
-              className={maxNumber === 10 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(10);
-              }}
-            >
-              10
-            </button>
-            <button
-              className={maxNumber === 11 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(11);
-              }}
-            >
-              11
-            </button>
-            <button
-              className={maxNumber === 12 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(12);
-              }}
-            >
-              12
-            </button>
-            <button
-              className={maxNumber === 13 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(13);
-              }}
-            >
-              13
-            </button>
-            <button
-              className={maxNumber === 14 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(14);
-              }}
-            >
-              14
-            </button>
-            <button
-              className={maxNumber === 15 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(15);
-              }}
-            >
-              15
-            </button>
-            <button
-              className={maxNumber === 16 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(16);
-              }}
-            >
-              16
-            </button>
-            <button
-              className={maxNumber === 17 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(17);
-              }}
-            >
-              17
-            </button>
-            <button
-              className={maxNumber === 18 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(18);
-              }}
-            >
-              18
-            </button>
-            <button
-              className={maxNumber === 19 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(19);
-              }}
-            >
-              19
-            </button>
-            <button
-              className={maxNumber === 20 ? "selected" : ""}
-              onClick={() => {
-                setMaxNumber(20);
-              }}
-            >
-              20
-            </button>
+        <div id="home" className="">
+          <div className="">
+            <div className="">Select difficulty</div>
+            <Levels setMaxNumber={setMaxNumber} />
             <div>
               <label>Goal: </label>
               <input
@@ -345,7 +210,7 @@ function App() {
             </div>
           </div>
 
-          <div>
+          <div id="results">
             <div>
               {hasRan && !timeRemaining ? `You got ${numCorrect} right!` : ""}
             </div>
@@ -354,39 +219,34 @@ function App() {
               {hasRan && !timeRemaining ? `You got ${numWrong} wrong.` : ""}
             </div>
           </div>
-          <button style={{ fontSize: 20 }} onClick={onSelectAddition}>
-            Addition test
-          </button>
-          <button style={{ fontSize: 20 }} onClick={onSelectMultiplication}>
-            Multiplication test
-          </button>
+          <div className="flex gap-2">
+            <button
+              className="bg-slate-500 rounded-sm m-4 w-full"
+              onClick={onSelectAddition}
+            >
+              Addition test
+            </button>
+            <button
+              className="bg-slate-500 rounded-sm m-4 w-full"
+              onClick={onSelectMultiplication}
+            >
+              Multiplication test
+            </button>
+          </div>
         </div>
       )}
-      {countdown > 0 && <div className="countdown">{countdown}</div>}
+      {countdown > 0 && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center align-center z-10 text-7xl">
+          {countdown}
+        </div>
+      )}
       {countdown <= 0 && timeRemaining > 0 && (
         <div className={`App${countdown > 0 ? " app-opaque" : ""}`}>
-          <div
-            style={{
-              flex: "1",
-              display: "flex",
-              justifyContent: "center",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
+          <div className="flex flex-col items-center justify-center">
             <div>
               <div>Time left: {timeRemaining}s</div>
             </div>
-            <div
-              style={{
-                fontWeight: "bold",
-                fontSize: "60px",
-                flex: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+            <div className="flex flex-col items-center justify-center text-6xl font-bold">
               {!useAddition && (
                 <span>
                   {number1} X {number2}
@@ -399,7 +259,7 @@ function App() {
               )}
             </div>
           </div>
-          <div className="Answer">
+          <div className="grid grid-rows-2 grid-cols-2 row-start-2 row-end-2">
             {answers.map((answer, index) => {
               const makeGreen =
                 wrongAnswer !== null &&
@@ -409,13 +269,14 @@ function App() {
               const makeRed = wrongAnswer === answer;
               return (
                 <div
-                  className="AnswerDiv"
+                  className="h-full w-full m-1"
                   style={{
                     gridColumnStart: index % 2 ? 2 : 1,
                     gridRowStart: index >= 2 ? 2 : 1,
                   }}
                 >
                   <button
+                    className="h-full w-full text-3xl font-bold transition-background duration-500 ease-in-out"
                     style={{
                       background: makeGreen
                         ? "lightgreen"
